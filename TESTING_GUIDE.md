@@ -48,15 +48,18 @@ npm run test:watch        # Run tests in watch mode (auto-rerun on file changes)
 ## Current Test Suite Status
 
 ### Summary:
-- ✅ **25 Tests Passing** (100% Pass Rate)
-- ⏱️ **Average Run Time:** 22 seconds
+- ✅ **72 Tests Passing** (100% Pass Rate)
+- ⏱️ **Average Run Time:** 46 seconds
+- 📊 **7 Test Files** covering comprehensive scenarios
 
 ### Test Files:
-1. **login.spec.js** (3/3 passing) ✅
-2. **login-advanced.spec.js** (7/7 passing) ✅
-3. **checkbox.spec.js** (5/5 passing) ✅
-4. **dropdown.spec.js** (6/6 passing) ✅
-5. **form.spec.js** (4/4 passing) ✅
+1. **assertions-practice.spec.js** (24/24 passing) ✅ - Chai assertion patterns with real examples
+2. **labels-and-text.spec.js** (23/23 passing) ✅ - Text content, labels, error messages
+3. **login.spec.js** (3/3 passing) ✅ - Basic login functionality
+4. **login-advanced.spec.js** (7/7 passing) ✅ - Advanced login validation
+5. **checkbox.spec.js** (5/5 passing) ✅ - Checkbox interactions
+6. **dropdown.spec.js** (6/6 passing) ✅ - Dropdown selections
+7. **form.spec.js** (4/4 passing) ✅ - Form input testing
 
 ## Debugging Tests
 
@@ -245,6 +248,145 @@ Look at these test files and identify what each assertion checks:
 
 For each assertion, ask yourself: "What is this test verifying?"
 
+## Labels and Text Content Testing
+
+### Overview
+The `labels-and-text.spec.js` file demonstrates practical text assertion patterns you'll use frequently when testing web applications.
+
+### Key Test Areas
+
+#### 1. Label Text Assertions
+Tests that verify form labels, headings, and button text contain expected content.
+
+```javascript
+// Verify exact heading text
+expect(heading).toHaveText('Login Page');
+
+// Verify label contains substring
+const labelText = await usernameLabel.getText();
+expect(labelText).toContain('Username');
+
+// Check multiple labels
+const labels = await $$('label');
+expect(labels).toHaveLength(2);
+```
+
+**Use case:** Form validation, page headers, button labels
+
+#### 2. Error Message Assertions
+Tests that verify error messages appear and contain relevant information.
+
+```javascript
+// Wait for error message to display
+const errorMessage = await $('.flash.error');
+await errorMessage.waitForDisplayed();
+
+// Verify error contains expected text
+const errorText = await errorMessage.getText();
+expect(errorText).toContain('invalid');
+```
+
+**Use case:** Login failures, form validation errors, API errors
+
+#### 3. Dynamic Text Content
+Tests that verify text updates correctly based on user interactions.
+
+```javascript
+// Initially empty
+let currentValue = await input.getValue();
+expect(currentValue).toBe('');
+
+// After user input
+await input.setValue('admin');
+currentValue = await input.getValue();
+expect(currentValue).toContain('admin');
+```
+
+**Use case:** Live search, auto-complete, form submission feedback
+
+#### 4. Text Matching Patterns
+Advanced techniques for flexible text matching.
+
+```javascript
+// Using regular expressions
+const headingText = await heading.getText();
+expect(/Login/i.test(headingText)).toBe(true);
+
+// Check text length
+expect(headingText.length).toBeGreaterThan(3);
+expect(headingText.length).toBeLessThan(50);
+
+// String methods
+expect(headingText.startsWith('Login')).toBe(true);
+expect(headingText.endsWith('Page')).toBe(true);
+
+// Word boundaries
+const words = headingText.split(' ');
+expect(words).toHaveLength(2);
+```
+
+**Use case:** Flexible validation, data format checking, boundary testing
+
+### Real-World Patterns
+
+#### Pattern 1: Verify Page Headers
+```javascript
+describe('Page Verification', () => {
+    it('should verify correct page loaded', async () => {
+        const heading = await $('h1');
+        expect(heading).toBeDisplayed();
+        expect(heading).toHaveText('Dashboard');
+    });
+});
+```
+
+#### Pattern 2: Error Message Validation
+```javascript
+describe('Form Error Handling', () => {
+    it('should show error on invalid submission', async () => {
+        await form.submit();
+        
+        const error = await $('.error-message');
+        expect(error).toBeDisplayed();
+        expect(error.getText()).toContain('required');
+    });
+});
+```
+
+#### Pattern 3: Dynamic Content Updates
+```javascript
+describe('Search Functionality', () => {
+    it('should update results text on search', async () => {
+        const initialText = await resultsLabel.getText();
+        expect(initialText).toContain('0 results');
+        
+        await searchInput.setValue('test');
+        const updatedText = await resultsLabel.getText();
+        expect(updatedText).toContain('10 results');
+    });
+});
+```
+
+### Common Text Assertion Methods
+
+| Method | Purpose | Example |
+|--------|---------|---------|
+| `toHaveText()` | Exact text match | `expect(el).toHaveText('Click Me')` |
+| `getText()` | Get text for custom checks | `const text = await el.getText()` |
+| `toContain()` | Partial text match | `expect(text).toContain('error')` |
+| `startsWith()` | Text begins with | `expect(text.startsWith('Login'))` |
+| `endsWith()` | Text ends with | `expect(text.endsWith('Page'))` |
+| `includes()` | Contains substring | `expect(text.includes('user'))` |
+
+### Testing Tips for Labels & Text
+
+1. **Always trim whitespace** - `getText()` handles this automatically
+2. **Case sensitivity** - `toHaveText()` is case-sensitive
+3. **Use `toContain()` for flexibility** - When exact text varies
+4. **Check visibility first** - Verify element displays before reading text
+5. **Handle dynamic content** - Use `await` and wait for element visibility
+6. **Combine assertions** - Verify text AND visibility together
+
 ## Tips for Learning
 
 ### 1. Start Small - Run Individual Test Files First
@@ -370,3 +512,272 @@ $('div > button')              // Find button directly inside div
 - Avoid `nth-child()` (brittle)
 - Prefer IDs, data-test attributes, or semantic HTML
 - Look for `data-testid`, `id`, or `name` attributes first
+
+## Learning Assertions: The Practice File
+
+### Overview
+The `assertions-practice.spec.js` file is a comprehensive learning resource demonstrating Chai assertion patterns in real-world WebdriverIO scenarios. It includes 24 practical tests organized into 8 learning suites.
+
+### Why This File Exists
+**Purpose:** Help new testers learn assertion syntax and patterns by example
+
+- Shows correct assertion syntax for different scenarios
+- Demonstrates passing vs. failing conditions
+- Uses real page objects and WebDriver commands
+- Includes comments explaining each pattern
+- Organized by assertion type for easy reference
+
+### Learning Suites Covered
+
+#### 1. Basic Equality Assertions (3 tests)
+Learn how to check if values are equal or not equal.
+
+```javascript
+describe('Basic Equality Assertions', () => {
+    it('should verify string equality', async () => {
+        // Exact match
+        expect('admin').toBe('admin');
+        expect('admin').not.toBe('password');
+    });
+
+    it('should verify number equality', async () => {
+        // Numbers
+        expect(42).toBe(42);
+        expect(42).not.toBe(0);
+    });
+
+    it('should verify boolean values', async () => {
+        // Booleans
+        expect(true).toBe(true);
+        expect(false).not.toBe(true);
+    });
+});
+```
+
+**Key Points:**
+- Use `toBe()` for strict equality (===)
+- Use `not.toBe()` for inequality
+- Works with strings, numbers, booleans
+
+#### 2. Element Visibility Assertions (3 tests)
+Learn how to verify elements display correctly.
+
+```javascript
+describe('Element Visibility Assertions', () => {
+    it('should verify element is displayed', async () => {
+        // Element must exist AND be visible
+        expect(LoginPage.inputUsername).toBeDisplayed();
+    });
+
+    it('should verify element exists', async () => {
+        // Element exists in DOM (doesn't need to be visible)
+        expect(LoginPage.inputUsername).toExist();
+    });
+
+    it('should verify element is not displayed', async () => {
+        // Element exists but not visible
+        expect(nonVisibleElement).not.toBeDisplayed();
+    });
+});
+```
+
+**Key Points:**
+- `toBeDisplayed()` = exists AND visible
+- `toExist()` = in DOM but may be hidden
+- Check these before reading element properties
+
+#### 3. Text Content Assertions (3 tests)
+Learn how to verify element text and labels.
+
+```javascript
+describe('Text Content Assertions', () => {
+    it('should verify element text matches exactly', async () => {
+        expect(button).toHaveText('Login');
+    });
+
+    it('should verify text contains substring', async () => {
+        const text = await heading.getText();
+        expect(text).toContain('Welcome');
+    });
+
+    it('should verify text matches pattern', async () => {
+        const text = await heading.getText();
+        expect(text.length).toBeGreaterThan(0);
+    });
+});
+```
+
+**Key Points:**
+- `toHaveText()` = exact match
+- `toContain()` = partial match
+- `getText()` gives you raw text for custom checks
+
+#### 4. Form Value Assertions (3 tests)
+Learn how to verify input field values.
+
+```javascript
+describe('Form Value Assertions', () => {
+    it('should verify input value', async () => {
+        await input.setValue('admin');
+        expect(input).toHaveValue('admin');
+    });
+
+    it('should verify empty input', async () => {
+        expect(input).toHaveValue('');
+    });
+
+    it('should verify placeholder', async () => {
+        expect(input).toHaveAttr('placeholder', 'Username');
+    });
+});
+```
+
+**Key Points:**
+- `toHaveValue()` = current input value
+- `toHaveAttr()` = HTML attribute checking
+- Always trim whitespace in assertions
+
+#### 5. Array and Count Assertions (3 tests)
+Learn how to verify multiple elements.
+
+```javascript
+describe('Array and Count Assertions', () => {
+    it('should verify array length', async () => {
+        const labels = await $$('label');
+        expect(labels).toHaveLength(2);
+    });
+
+    it('should verify array contains element', async () => {
+        const options = await dropdown.$$('option');
+        expect(options.length).toBeGreaterThan(0);
+    });
+
+    it('should verify element count', async () => {
+        const items = await $$('.item');
+        expect(items).not.toHaveLength(0);
+    });
+});
+```
+
+**Key Points:**
+- `toHaveLength()` = exact count
+- `toBeGreaterThan()` = range checking
+- `$$` returns array of elements
+
+#### 6. Boolean and Existence Assertions (3 tests)
+Learn how to verify conditions and element existence.
+
+```javascript
+describe('Boolean and Existence Assertions', () => {
+    it('should verify condition is true', async () => {
+        const isDisplayed = await element.isDisplayed();
+        expect(isDisplayed).toBe(true);
+    });
+
+    it('should verify element exists in page object', async () => {
+        expect(LoginPage.inputUsername).toBeDefined();
+    });
+
+    it('should verify element is not present', async () => {
+        const elements = await $$('.nonexistent');
+        expect(elements).toHaveLength(0);
+    });
+});
+```
+
+**Key Points:**
+- `toBe(true/false)` for boolean checks
+- `toBeDefined()` = defined in code
+- `toHaveLength(0)` = not present in DOM
+
+#### 7. Attribute Assertions (3 tests)
+Learn how to verify HTML attributes.
+
+```javascript
+describe('Attribute Assertions', () => {
+    it('should verify element has specific attribute', async () => {
+        expect(input).toHaveAttr('type', 'text');
+    });
+
+    it('should verify disabled attribute', async () => {
+        expect(disabledButton).toHaveAttr('disabled');
+    });
+
+    it('should verify class attribute', async () => {
+        expect(element).toHaveAttr('class');
+        const classes = await element.getAttribute('class');
+        expect(classes).toContain('active');
+    });
+});
+```
+
+**Key Points:**
+- `toHaveAttr()` = check HTML attributes
+- `getAttribute()` = get attribute value for custom logic
+- Common attributes: type, disabled, class, id, data-*
+
+#### 8. Page Object Integration (3 tests)
+Learn how to use assertions with page objects.
+
+```javascript
+describe('Page Object Integration', () => {
+    it('should verify page objects return elements', async () => {
+        expect(LoginPage.inputUsername).toBeDefined();
+        expect(LoginPage.inputPassword).toBeDefined();
+        expect(LoginPage.buttonLogin).toBeDefined();
+    });
+
+    it('should verify page object methods work', async () => {
+        await LoginPage.login('admin', 'admin');
+        // Now verify success
+        const dashboard = await $('h1');
+        expect(dashboard).toHaveText('Dashboard');
+    });
+
+    it('should combine multiple assertions', async () => {
+        // Check multiple conditions in one test
+        expect(LoginPage.inputUsername).toBeDisplayed();
+        expect(LoginPage.inputPassword).toBeDisplayed();
+        expect(LoginPage.buttonLogin).toBeDisplayed();
+    });
+});
+```
+
+**Key Points:**
+- Page objects make tests more maintainable
+- Group related assertions together
+- Use methods for reusable test steps
+
+### How to Use This File for Learning
+
+1. **Read a test** - Pick one from the 24 tests
+2. **Run it** - See it pass: `npm test -- --spec test/specs/assertions-practice.spec.js`
+3. **Modify it** - Change an assertion to make it fail
+4. **Run it again** - See the failure message
+5. **Fix it** - Change it back and verify it passes
+6. **Apply it** - Use the pattern in your own tests
+
+### Reference: All Assertion Types
+
+| Assertion | Checks | Example |
+|-----------|--------|---------|
+| `toBe()` | Strict equality | `expect('admin').toBe('admin')` |
+| `toHaveText()` | Exact text match | `expect(el).toHaveText('Login')` |
+| `toContain()` | Substring/includes | `expect(text).toContain('error')` |
+| `toBeDisplayed()` | Element visible | `expect(el).toBeDisplayed()` |
+| `toExist()` | Element in DOM | `expect(el).toExist()` |
+| `toHaveValue()` | Input value | `expect(input).toHaveValue('text')` |
+| `toHaveAttr()` | HTML attribute | `expect(el).toHaveAttr('type')` |
+| `toHaveLength()` | Array/string length | `expect(items).toHaveLength(5)` |
+| `toBeDefined()` | Variable defined | `expect(obj).toBeDefined()` |
+| `toBeGreaterThan()` | Numeric comparison | `expect(count).toBeGreaterThan(0)` |
+
+### Best Practices from This File
+
+1. **Combine page objects with assertions** - Cleaner, more maintainable tests
+2. **One assertion focus per test** - Each test verifies one specific thing
+3. **Use descriptive test names** - Names explain what is being verified
+4. **Check visibility before reading** - Always verify element displays
+5. **Use page object methods** - Reuse common interactions
+6. **Group related tests** - Organize by assertion type or feature
+7. **Document complex assertions** - Add comments for learning
