@@ -86,6 +86,165 @@ get inputUsername () {
 await LoginPage.inputUsername.setValue('test');  // Use it
 ```
 
+## Chai Assertions Guide
+
+**What is Chai?** Chai is an assertion library that lets you write readable test conditions. Every test ends with an assertion that verifies something happened correctly.
+
+### Basic Chai Syntax
+```javascript
+expect(actual).toBe(expected);           // Simple equality
+expect(actual).to.equal(expected);       // Same as above
+expect(actual).to.include(value);        // Check if contains
+expect(actual).to.be.true;               // Check if truthy
+expect(actual).to.be.false;              // Check if falsy
+expect(actual).to.not.equal(unexpected); // Negation (not equal)
+```
+
+### WebdriverIO-Specific Assertions
+WebdriverIO extends Chai with browser-specific matchers for testing web elements.
+
+#### **Element Visibility & Presence**
+```javascript
+// Check if element is displayed (visible on page)
+expect(element).toBeDisplayed();
+expect(element).not.toBeDisplayed();
+
+// Check if element exists in DOM
+expect(element).toExist();
+expect(element).not.toExist();
+
+// Check if element is clickable
+expect(element).toBeClickable();
+```
+
+**Real example from our tests:**
+```javascript
+// From checkbox.spec.js
+expect(await CheckboxPage.firstCheckbox).toBeDisplayed();  // Verify checkbox exists
+```
+
+#### **Text Content**
+```javascript
+// Check exact text
+expect(element).toHaveText('Expected Text');
+
+// Check if contains partial text
+expect(element).toHaveTextContaining('partial');
+
+// Get and check element text
+const text = await element.getText();
+expect(text).toContain('error');
+```
+
+**Real example from our tests:**
+```javascript
+// From login.spec.js
+expect(await LoginPage.alertFlash).toHaveText('Your username is invalid!');
+```
+
+#### **Input Values & Attributes**
+```javascript
+// Check input field value
+expect(input).toHaveValue('expected value');
+
+// Check HTML attribute
+expect(element).toHaveAttribute('href', 'https://example.com');
+
+// Check CSS class
+expect(element).toHaveElementClass('active');
+```
+
+**Real example from our tests:**
+```javascript
+// From form.spec.js
+expect(input).toHaveValue('test input');  // Verify form field has correct value
+```
+
+#### **Multiple Elements (Arrays)**
+```javascript
+// Check count of elements
+const elements = $$('button');
+expect(elements).toHaveLength(5);  // Should find exactly 5 buttons
+
+// Check each element
+elements.forEach(elem => {
+    expect(elem).toBeDisplayed();
+});
+```
+
+**Real example from our tests:**
+```javascript
+// From dropdown.spec.js
+const options = await DropdownPage.getAllOptions();
+expect(options).toBeDefined();  // Verify we got the options
+```
+
+### Common Assertion Patterns in Our Tests
+
+#### Pattern 1: Verify Page Loads
+```javascript
+// Check if main element displays
+expect(await LoginPage.inputUsername).toBeDisplayed();
+```
+**What it does:** Confirms the page loaded correctly by checking a key element exists
+
+#### Pattern 2: Verify Form Submission
+```javascript
+await LoginPage.login('admin', 'admin');
+expect(await LoginPage.alertFlash).toHaveText('Your username is invalid!');
+```
+**What it does:** Confirms the form was submitted and we got expected feedback
+
+#### Pattern 3: Verify State Changes
+```javascript
+await CheckboxPage.toggleCheckbox(0);
+expect(checkbox).toBeChecked();
+```
+**What it does:** Confirms user action resulted in expected state change
+
+#### Pattern 4: Verify List/Array Operations
+```javascript
+const options = await DropdownPage.getAllOptions();
+expect(options.length).toBeGreaterThan(0);
+```
+**What it does:** Confirms collection has expected items
+
+### Assertion Chaining (Advanced)
+```javascript
+// Chain multiple assertions
+expect(element)
+    .to.exist
+    .and.to.be.visible
+    .and.to.have.text('Click Me');
+
+// This is equivalent to:
+expect(element).toExist();
+expect(element).toBeDisplayed();
+expect(element).toHaveText('Click Me');
+```
+
+### Debugging Failed Assertions
+When an assertion fails, Chai shows:
+```
+Expected: value to be 'admin'
+Received: 'invalid'
+```
+
+**How to fix:**
+1. Check the "Expected" vs "Received" values
+2. Look at the element/page object selector
+3. Run the test with debug logs enabled
+4. Use `await browser.debug()` to pause and inspect
+
+### Practice Exercise: Reading Assertions
+Look at these test files and identify what each assertion checks:
+1. **login.spec.js** - Find `.toHaveText()` assertions
+2. **checkbox.spec.js** - Find `.toBeDisplayed()` assertions
+3. **form.spec.js** - Find `.toHaveValue()` assertions
+4. **dropdown.spec.js** - Find array/length assertions
+
+For each assertion, ask yourself: "What is this test verifying?"
+
 ## Tips for Learning
 
 ### 1. Start Small - Run Individual Test Files First
