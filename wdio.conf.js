@@ -1,21 +1,19 @@
 exports.config = {
     runner: 'local',
-    port: 4723,
     specs: [
         './test/specs/**/*.js',
     ],
     exclude: [],
     maxInstances: 1,
     capabilities: [{
-        platformName: 'mac',
         browserName: 'chrome',
         'wdio:devtoolsOptions': {
-            headless: false
+            headless: true
         }
     }],
     logLevel: 'info',
     bail: 0,
-    baseUrl: 'http://localhost',
+    baseUrl: 'http://the-internet.herokuapp.com',
     waitforTimeout: 10000,
     connectionRetryTimeout: 120000,
     connectionRetryCount: 3,

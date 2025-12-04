@@ -17,6 +17,6 @@ describe('Login Page Tests', () => {
         await LoginPage.open();
         await LoginPage.login('invalid', 'invalid');
         await expect(LoginPage.alertFlash).toBeDisplayed();
-        await expect(LoginPage.alertFlash).toHaveTextContaining('Your username is invalid!');
+        await expect(LoginPage.alertFlash).toHaveText(expect.stringContaining('Your username is invalid!'));
     });
 });
